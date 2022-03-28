@@ -1,33 +1,45 @@
-import type { Alike, Equal, Expect, ExpectFalse } from "./testing.ts";
-import type { IsAny, IsNever, IsUnion, Optional, ToReadable, UnionToIntersection, UnionToTuple } from "./utils.ts";
+import type { Alike, Equal, Expect, ExpNot } from "./testing.ts";
+import type {
+  IsAny,
+  IsNever,
+  IsUnion,
+  Optional,
+  ToReadable,
+  UnionToIntersection,
+  UnionToTuple,
+  RecursiveRecord,
+} from "./utils.ts";
 
 export declare const cases: {
   IsAny: [
-    ExpectFalse<IsAny<number>>,
-    ExpectFalse<IsAny<string>>,
-    ExpectFalse<IsAny<boolean>>,
-    ExpectFalse<IsAny<Record<string, unknown>>>,
-    ExpectFalse<IsAny<unknown>>,
+    ExpNot<IsAny<number>>,
+    ExpNot<IsAny<string>>,
+    ExpNot<IsAny<boolean>>,
+    ExpNot<IsAny<Record<string, unknown>>>,
+    ExpNot<IsAny<unknown>>,
     // deno-lint-ignore no-explicit-any
     Expect<IsAny<any>>
   ];
 
   IsNever: [
     Expect<IsNever<never>>,
-    ExpectFalse<IsNever<number>>,
-    ExpectFalse<IsNever<string>>,
-    ExpectFalse<IsNever<boolean>>,
-    ExpectFalse<IsNever<Record<string, unknown>>>,
-    ExpectFalse<IsNever<unknown>>
+    Expect<IsNever<never & 1>>,
+    ExpNot<IsNever<number>>,
+    ExpNot<IsNever<string>>,
+    ExpNot<IsNever<boolean>>,
+    ExpNot<IsNever<Record<string, unknown>>>,
+    ExpNot<IsNever<unknown>>
   ];
 
   IsUnion: [
     Expect<IsUnion<1 | 2 | 3 | 4>>,
     Expect<IsUnion<boolean>>,
-    ExpectFalse<IsUnion<number>>,
-    ExpectFalse<IsUnion<string>>,
-    ExpectFalse<IsUnion<Record<string, unknown>>>,
-    ExpectFalse<IsUnion<unknown>>
+    ExpNot<IsUnion<number>>,
+    ExpNot<IsUnion<string>>,
+    ExpNot<IsUnion<Record<string, unknown>>>,
+    ExpNot<IsUnion<unknown | true>>,
+    // deno-lint-ignore no-explicit-any
+    ExpNot<IsUnion<any | true>>
   ];
 
   Optional: [
@@ -49,21 +61,28 @@ export declare const cases: {
   ];
 
   UnionToIntersection: [
-    Expect<Equal<UnionToIntersection<1 | 2 | 3 | 4>, 1 & 2 & 3 & 4>>,
-    Expect<Equal<UnionToIntersection<boolean>, true & false>>,
+    Expect<Equal<UnionToIntersection<1 | 2 | 3 | 4>, never>>,
+    Expect<Equal<UnionToIntersection<boolean>, never>>,
     Expect<Equal<UnionToIntersection<number>, number>>,
     Expect<Equal<UnionToIntersection<string>, string>>,
-    Expect<Equal<UnionToIntersection<Record<string, unknown>>, Record<string, unknown>>>,
+    Expect<
+      Alike<UnionToIntersection<Record<string, unknown> | Record<number, unknown>>, Record<string | number, unknown>>
+    >,
     Expect<Equal<UnionToIntersection<unknown>, unknown>>,
-    Expect<Alike<UnionToIntersection<{ a: 1 } & { b: 2 } & { c: 3 }>, { a: 1; b: 2; c: 3 }>>
+    Expect<Alike<UnionToIntersection<{ a: 1 } | { b: 2 } | { c: 3 }>, { a: 1; b: 2; c: 3 }>>
   ];
 
   UnionToTuple: [
     Expect<Equal<UnionToTuple<boolean>, [false, true]>>,
-    Expect<Alike<UnionToTuple<number>, [number]>>,
-    Expect<Alike<UnionToTuple<string>, [string]>>,
-    Expect<Alike<UnionToTuple<Record<string, unknown>>, [Record<string, unknown>]>>,
-    Expect<Alike<UnionToTuple<unknown>, [unknown]>>,
-    Expect<Alike<UnionToTuple<{ a: 1 } | { b: 2 } | { c: 3 }>, [{ a: 1 }, { b: 2 }, { c: 3 }]>>
+    Expect<Equal<UnionToTuple<number>, [number]>>,
+    Expect<Equal<UnionToTuple<string>, [string]>>,
+    Expect<Equal<UnionToTuple<Record<string, unknown>>, [Record<string, unknown>]>>,
+    Expect<Equal<UnionToTuple<unknown>, [unknown]>>,
+    Expect<Equal<UnionToTuple<{ a: 1 } | { b: 2 } | { c: 3 }>, [{ a: 1 }, { b: 2 }, { c: 3 }]>>
+  ];
+
+  RecursiveRecord: [
+    Expect<Equal<RecursiveRecord<string, number>[string], number | RecursiveRecord<string, number>>>,
+    Expect<IsUnion<RecursiveRecord<symbol, boolean>[symbol]>>
   ];
 };

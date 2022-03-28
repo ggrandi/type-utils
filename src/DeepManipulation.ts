@@ -4,9 +4,10 @@ import { IsNever, ToReadable, UnionToIntersection } from "./mod.ts";
  * Allows you to deeply pick values
  * ```
  * type Obj = { a: { b: { c: 1 }; d?: { e: 2; f: 3 } } }
- * type R1 = DeepPick<Obj, "a.b"> // => { a: { b: { c: 1 }}}
- * type R2 = DeepPick<Obj, "a.b" | "a.d.e">
- * // => { a: { b: { c: 1 }; d?: { e: 2 } | undefined } }
+ * type R1 = DeepPick<Obj, "a.b">;
+ * -> { a: { b: { c: 1 }}}
+ * type R2 = DeepPick<Obj, "a.b" | "a.d.e">;
+ * -> { a: { b: { c: 1 }; d?: { e: 2 } | undefined } }
  * ```
  * @see Pick
  */
@@ -44,9 +45,10 @@ type DeepKeyToObj<K extends DeepKey<Record<string, unknown>>> = UnionToIntersect
  * Deeply omits values from an object
  * ```
  * type Obj = { a: { b: { c: 1 }; d?: { e: 2; f: 3 } } }
- * type R1 = DeepOmit<Obj, "a.b"> // => { a: { d?: { e: 2; f: 3 } } }
- * type R2 = DeepOmit<Obj, "a.b" | "a.d.e">
- * // => { a: { d?: { f: 3 } | undefined } }
+ * type R1 = DeepOmit<Obj, "a.b">;
+ * -> { a: { d?: { e: 2; f: 3 } } }
+ * type R2 = DeepOmit<Obj, "a.b" | "a.d.e">;
+ * -> { a: { d?: { f: 3 } | undefined } }
  * ```
  * @see Omit
  */
